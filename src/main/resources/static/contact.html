@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Contact Me()</title>
+
+  <!-- Font Awesome for social icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="stylesheet" href="contact.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+</head>
+<body>
+  <section class="contact-section">
+    <h2 class="contact-title">CONTACT ME()</h2>
+
+    <div class="contact-container">
+      <!-- Left Panel — Info -->
+      <div class="info-panel">
+        <h3 class="info-title">Let's Build Something Amazing Together</h3>
+        <p class="info-text">
+          Ready to bring your ideas to life? Whether you need a web application, mobile app, or custom software solution, I'm here to help you succeed.
+        </p>
+
+        <div class="social-icons">
+          <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub">
+            <i class="fab fa-github"></i>
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+            <i class="fab fa-linkedin"></i>
+          </a>
+          <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="mailto:test@email.com" aria-label="Email">
+            <i class="fas fa-envelope"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Panel — Form -->
+      <div class="contact-form">
+        <form id="contactForm" autocomplete="off">
+          <div class="form-group">
+            <label for="name" class="label">NAME</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="Your name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="label">EMAIL</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="parvezalamshaik59@gmail.com" required />
+          </div>
+
+          <div class="form-group">
+            <label for="subject" class="label">SUBJECT</label>
+            <input type="text" id="subject" name="subject" class="form-control" placeholder="Project discussion" />
+          </div>
+
+          <div class="form-group">
+            <label for="message" class="label">MESSAGE</label>
+            <textarea id="message" name="message" class="form-control textarea" placeholder="Tell me about your project..." rows="6" required></textarea>
+          </div>
+
+          <button id="sendBtn" type="submit" class="send-btn">SEND_MESSAGE</button>
+
+          <div id="formMessage" class="form-message" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      const form = document.getElementById('contactForm');
+      const sendBtn = document.getElementById('sendBtn');
+      const formMessage = document.getElementById('formMessage');
+
+      function setMessage(text, type) {
+        formMessage.textContent = text;
+        formMessage.className = 'form-message ' + (type === 'error' ? 'error' : 'success');
+        formMessage.style.display = 'block';
+      }
+
+      function clearMessage() {
+        formMessage.textContent = '';
+        formMessage.style.display = 'none';
+      }
+
+      function setSubmitting(submitting) {
+        if (submitting) {
+          sendBtn.disabled = true;
+          sendBtn.textContent = 'TRANSMITTING...';
+          sendBtn.classList.add('sending');
+        } else {
+          sendBtn.disabled = false;
+          sendBtn.textContent = 'SEND_MESSAGE';
+          sendBtn.classList.remove('sending');
+        }
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        clearMessage();
+
+        const data = {
+          name: form.name.value.trim(),
+          email: form.email.value.trim(),
+          subject: form.subject.value.trim(),
+          message: form.message.value.trim()
+        };
+
+        // Basic client-side validation
+        if (!data.name || !data.email || !data.message) {
+          setMessage('ERROR ✗ FILL ALL REQUIRED FIELDS', 'error');
+          return;
+        }
+
+        setSubmitting(true);
+
+        try {
+          const res = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+
+          if (res.ok) {
+            setMessage('MESSAGE SENT ✓ CONNECTION ESTABLISHED', 'success');
+            form.reset();
+          } else {
+            // Try to read server message if available
+            let text;
+            try { text = await res.text(); } catch (ignored) { text = ''; }
+            setMessage('ERROR ✗ SERVER ISSUE' + (text ? ': ' + text : ''), 'error');
+          }
+        } catch (err) {
+          setMessage('ERROR ✗ NETWORK OR SERVER DOWN', 'error');
+        } finally {
+          setTimeout(() => setSubmitting(false), 600); // small delay to show TRANSmitting
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
