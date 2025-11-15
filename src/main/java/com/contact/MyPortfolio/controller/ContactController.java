@@ -2,7 +2,7 @@ package com.contact.MyPortfolio.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;   // <-- THIS covers PostMapping & GetMapping
+import org.springframework.web.bind.annotation.*;   // <--- THIS IS REQUIRED!
 import com.contact.MyPortfolio.entity.ContactMessage;
 import com.contact.MyPortfolio.service.ContactMessageService;
 
@@ -13,11 +13,6 @@ public class ContactController {
 
     @Autowired
     private ContactMessageService service;
-
-    @GetMapping("/test")
-    public String test() {
-        return "Backend is working!";
-    }
 
     @PostMapping
     public ResponseEntity<String> submitMessage(@RequestBody ContactMessage message) {
